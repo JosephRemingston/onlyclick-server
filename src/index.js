@@ -22,6 +22,10 @@ app.use(cookieParser(process.env.COOKIE_SECRET));
 // Routes
 app.use('/api/contractors', contractorRoutes);
 
+app.get('/',(req,res)=>{
+  res.send("<h1>backend</h1>");
+})
+
 // MongoDB Connection
 mongoose
   .connect(process.env.MONGODB_URI)
