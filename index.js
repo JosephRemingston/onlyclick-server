@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import helmet from 'helmet';
-import contractorRoutes from './routes/contractor.routes.js';
+import contractorRoutes from './src/routes/contractor.routes.js';
 import cookieParser from 'cookie-parser';
 
 dotenv.config();

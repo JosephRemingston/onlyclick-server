@@ -2,11 +2,12 @@
   "name": "contractor-backend",
   "version": "1.0.0",
   "description": "Backend for contractor onboarding",
-  "main": "src/index.js",
+  "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "node src/index.js",
-    "dev": "nodemon src/index.js",
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "build": "node index.js",
     "prettier": "prettier --write ."
   },
   "dependencies": {
