@@ -17,15 +17,17 @@ async function createVerification(phoneNumber) {
     const verification = await client.verify.v2
       .services(serviceID)
       .verifications.create({
-        channel: "sms",
+        channel: 'sms',
         to: formattedPhoneNumber,
         // customMessage: messageBody, // Set custom message body
       });
 
-    console.log(`Verification status for ${formattedPhoneNumber}: ${verification.status}`);
+    console.log(
+      `Verification status for ${formattedPhoneNumber}: ${verification.status}`
+    );
     return verification.status;
   } catch (error) {
-    console.error("Error creating verification:", error.message);
+    console.error('Error creating verification:', error.message);
     throw error;
   }
 }
@@ -36,14 +38,14 @@ async function createVerificationCheck(verificationCode, phoneNumber) {
       .services(serviceID)
       .verificationChecks.create({
         code: verificationCode,
-        to: "+91" + phoneNumber,
+        to: '+91' + phoneNumber,
       });
 
     console.log(verificationCheck.status);
     return verificationCheck.status; // "approved" if successful
   } catch (error) {
-    console.error("Error during OTP verification");
-    throw new Error("Failed to verify OTP. Please try again.");
+    console.error('Error during OTP verification');
+    throw new Error('Failed to verify OTP. Please try again.');
   }
 }
 

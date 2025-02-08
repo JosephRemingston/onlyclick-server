@@ -26,6 +26,7 @@ A Node.js backend API for contractor onboarding in a home services application. 
 ## API Endpoints
 
 ### Request OTP
+
 Sends an OTP to the provided phone number and checks if the contractor already exists.
 
 - **URL**: `/api/contractors/request-otp`
@@ -33,6 +34,7 @@ Sends an OTP to the provided phone number and checks if the contractor already e
 - **Content-Type**: `application/json`
 
 **Request Body**:
+
 ```json
 {
   "phoneNumber": "+1234567890"
@@ -40,8 +42,10 @@ Sends an OTP to the provided phone number and checks if the contractor already e
 ```
 
 **Success Response**:
+
 - **Code**: 200
 - **Content**:
+
 ```json
 {
   "message": "OTP sent successfully",
@@ -50,8 +54,10 @@ Sends an OTP to the provided phone number and checks if the contractor already e
 ```
 
 **Error Response**:
+
 - **Code**: 400
 - **Content**:
+
 ```json
 {
   "errors": [
@@ -65,6 +71,7 @@ Sends an OTP to the provided phone number and checks if the contractor already e
 ```
 
 ### Verify OTP
+
 Verifies the OTP sent to the contractor's phone number.
 
 - **URL**: `/api/contractors/verify-otp`
@@ -72,6 +79,7 @@ Verifies the OTP sent to the contractor's phone number.
 - **Content-Type**: `application/json`
 
 **Request Body**:
+
 ```json
 {
   "phoneNumber": "+1234567890",
@@ -80,8 +88,10 @@ Verifies the OTP sent to the contractor's phone number.
 ```
 
 **Success Response**:
+
 - **Code**: 200
 - **Content**:
+
 ```json
 {
   "message": "OTP verified successfully",
@@ -90,8 +100,10 @@ Verifies the OTP sent to the contractor's phone number.
 ```
 
 **Error Response**:
+
 - **Code**: 400
 - **Content**:
+
 ```json
 {
   "error": "Invalid or expired OTP"
@@ -99,6 +111,7 @@ Verifies the OTP sent to the contractor's phone number.
 ```
 
 ### Complete Profile
+
 Completes or updates the contractor's profile after phone verification.
 
 - **URL**: `/api/contractors/complete-profile`
@@ -106,6 +119,7 @@ Completes or updates the contractor's profile after phone verification.
 - **Content-Type**: `application/json`
 
 **Request Body**:
+
 ```json
 {
   "phoneNumber": "+1234567890",
@@ -117,8 +131,10 @@ Completes or updates the contractor's profile after phone verification.
 ```
 
 **Success Response**:
+
 - **Code**: 200
 - **Content**:
+
 ```json
 {
   "message": "Profile completed successfully",
@@ -133,15 +149,19 @@ Completes or updates the contractor's profile after phone verification.
 ```
 
 **Error Responses**:
+
 - **Code**: 400
 - **Content**:
+
 ```json
 {
   "error": "Phone number not verified"
 }
 ```
+
 - **Code**: 404
 - **Content**:
+
 ```json
 {
   "error": "Contractor not found"
@@ -159,6 +179,7 @@ All endpoints follow a consistent error response format:
 ```
 
 Common HTTP status codes:
+
 - `200`: Success
 - `400`: Bad Request (invalid input)
 - `404`: Not Found
@@ -197,6 +218,7 @@ Common HTTP status codes:
 ## Development
 
 To run in development mode with hot reloading:
+
 ```bash
 npm run dev
 ```

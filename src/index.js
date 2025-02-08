@@ -12,14 +12,19 @@ const app = express();
 
 // Middleware
 app.use(express.json());
-app.use(cors());
+app.use(cors(
+  {origin: '*'}
+));
+
 app.use(helmet());
-app.use(cookieParser());
+
+app.use(cookieParser(process.env.COOKIE_SECRET));
 // Routes
 app.use('/api/contractors', contractorRoutes);
 
 // MongoDB Connection
-mongoose.connect(process.env.MONGODB_URI)
+mongoose
+  .connect(process.env.MONGODB_URI)
   .then(() => console.log('Connected to MongoDB'))
   .catch((err) => console.error('MongoDB connection error:', err));
 

@@ -1,47 +1,56 @@
 import mongoose from 'mongoose';
 import jwt from 'jsonwebtoken';
 
-const contractorSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: false, // Initially false as it's collected after OTP verification
+const contractorSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: false, // Initially false as it's collected after OTP verification
+    },
+    phoneNumber: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    secondaryPhoneNumber: {
+      type: String,
+      required: false,
+    },
+    address: {
+      type: String,
+      required: false,
+    },
+    category: {
+      type: String,
+      required: false,
+    },
+    workers: [
+      {
+        type: String,
+        required: false,
+      },
+    ],
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
   },
-  phoneNumber: {
-    type: String,
-    required: true,
-    unique: true,
-  },
-  secondaryPhoneNumber: {
-    type: String,
-    required: false,
-  },
-  address: {
-    type: String,
-    required: false,
-  },
-  category: {
-    type: String,
-    required: false,
-  },
-  isVerified: {
-    type: Boolean,
-    default: false,
-  },
-}, {
-  timestamps: true
-});
+  {
+    timestamps: true,
+  }
+);
 
 contractorSchema.methods.generateAccessToken = function () {
   return jwt.sign(
     {
       _id: this._id,
       name: this.name,
-      mobileNumber: this.mobileNumber,
+      phoneNumber: this.phoneNumber,
       email: this.email,
       role: this.role,
     },
     process.env.JWT_SECRET,
-    { expiresIn: "1d" }
+    { expiresIn: '1d' }
   );
 };
 
@@ -52,7 +61,7 @@ contractorSchema.methods.generateRefreshToken = function () {
       _id: this._id,
     },
     process.env.JWT_SECRET,
-    { expiresIn: "10d" }
+    { expiresIn: '10d' }
   );
 };
 
