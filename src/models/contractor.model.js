@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-const jwt = require("jsonwebtoken");
+import jwt from 'jsonwebtoken';
 
 const contractorSchema = new mongoose.Schema({
   name: {
@@ -27,13 +27,10 @@ const contractorSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
-  otp: {
-    code: String,
-    expiresAt: Date,
-  }
 }, {
   timestamps: true
 });
+
 contractorSchema.methods.generateAccessToken = function () {
   return jwt.sign(
     {

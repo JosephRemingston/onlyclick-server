@@ -1,14 +1,17 @@
 import dotenv from 'dotenv';
+import twilio from 'twilio';
+
 dotenv.config();
+
 const accountSid = process.env.TWILIO_ACCOUNT_SIDV;
 const authToken = process.env.TWILIO_AUTH_TOKENV;
-const serviceID=process.env.TWILIO_SERVICE_IDV;
-const client = require('twilio')(accountSid, authToken);
+const serviceID = process.env.TWILIO_SERVICE_IDV;
+const client = twilio(accountSid, authToken);
 
 async function createVerification(phoneNumber) {
-  const formattedPhoneNumber = '+91'+phoneNumber;
+  const formattedPhoneNumber = '+91' + phoneNumber;
 
-  const messageBody = `Femtro: Your verification code is {OTP}. It will expire in 10 minutes.`;
+  const messageBody = `OnlyClick: Your verification code is {OTP}. It will expire in 10 minutes.`;
 
   try {
     const verification = await client.verify.v2
@@ -27,23 +30,21 @@ async function createVerification(phoneNumber) {
   }
 }
 
-
-
 async function createVerificationCheck(verificationCode, phoneNumber) {
-    try {
-      const verificationCheck = await client.verify.v2
-        .services(serviceID)
-        .verificationChecks.create({
-          code: verificationCode,
-          to: "+91" + phoneNumber,
-        });
-  
-      console.log(verificationCheck.status);
-      return verificationCheck.status; // "approved" if successful
-    } catch (error) {
-      console.error("Error during OTP verification");
-      throw new Error("Failed to verify OTP. Please try again.");
-    }
+  try {
+    const verificationCheck = await client.verify.v2
+      .services(serviceID)
+      .verificationChecks.create({
+        code: verificationCode,
+        to: "+91" + phoneNumber,
+      });
+
+    console.log(verificationCheck.status);
+    return verificationCheck.status; // "approved" if successful
+  } catch (error) {
+    console.error("Error during OTP verification");
+    throw new Error("Failed to verify OTP. Please try again.");
   }
-  
-module.exports = { createVerification,createVerificationCheck };
+}
+
+export { createVerification, createVerificationCheck };

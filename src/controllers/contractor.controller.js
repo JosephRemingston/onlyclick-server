@@ -1,21 +1,16 @@
-const User = require("../Models/User_model");
-const jwt = require("jsonwebtoken");
-const {
-  createVerification,
-  createVerificationCheck,
-} = require("../../Services/Twilio_intigration");
-require("dotenv").config();
+import Contractor from "../models/contractor.model.js";
+import jwt from "jsonwebtoken";
+import { createVerification, createVerificationCheck } from "../services/twilioService.js";
+import dotenv from "dotenv";
 
-const generateAccessAndRefreshToken = async (user) => {
-  const accessToken = user.generateAccessToken();
-  const refreshToken = user.generateRefreshToken();
-  user.refreshToken = refreshToken;
-  await user.save();
-  return { accessToken, refreshToken };
+dotenv.config();
+
+const generateAccessToken = (contractor) => {
+  return jwt.sign({ id: contractor._id, role: contractor.role }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '15m' });
 };
 
 // Send OTP
-async function sendOTPverification(req, res) {
+export async function sendOTPverification(req, res) {
   const { phoneNumber } = req.body;
 
   if (!phoneNumber) {
@@ -31,7 +26,7 @@ async function sendOTPverification(req, res) {
   }
 }
 
-async function OTPValidation(req, res) {
+export async function OTPValidation(req, res) {
   const { phoneNumber, code } = req.body;
 
   if (!phoneNumber || !code) {
@@ -42,23 +37,22 @@ async function OTPValidation(req, res) {
     const status = await createVerificationCheck(code, phoneNumber);
 
     if (status === "approved") {
-      const user = await User.findOne({ mobileNumber: phoneNumber });
+      const contractor = await Contractor.findOne({
+        $or: [{ phoneNumber }, { secondaryPhoneNumber: phoneNumber }],
+      });
 
-      if (user) {
-        // User exists → Login successful
-        const { accessToken, refreshToken } =
-          await generateAccessAndRefreshToken(user);
+      if (contractor) {
+        // Contractor exists → Login successful
+        const accessToken = generateAccessToken(contractor);
+
+        res.cookie('accessToken', accessToken, { httpOnly: true, secure: true });
 
         return res.status(200).json({
           message: "Login successful",
-          accessToken,
-          refreshToken,
-          user: { id: user._id, name: user.name, role: user.role },
+          contractor: { id: contractor._id, name: contractor.name, address: contractor.address, category: contractor.category },
         });
       } else {
-        return res
-          .status(201)
-          .json({ message: "User not found. Proceed to signup." });
+        return res.status(201).json({ message: "Contractor not found. Proceed to signup." });
       }
     } else {
       return res.status(400).json({ error: "Invalid OTP" });
@@ -70,81 +64,42 @@ async function OTPValidation(req, res) {
 }
 
 // Signup
-async function signup(req, res) {
-  const { name, mobileNumber, email, gender, dob, address } = req.body;
+export async function signup(req, res) {
+  const { name, phoneNumber, address, category } = req.body;
 
-  if (!name || !mobileNumber || !email || !dob || !address || !gender) {
+  if (!name || !phoneNumber || !address || !category) {
     return res.status(400).json({ error: "All fields are required" });
   }
 
-
   try {
-    const existingUser = await User.findOne({ mobileNumber });
+    const existingContractor = await Contractor.findOne({
+      $or: [{ phoneNumber }, { secondaryPhoneNumber: phoneNumber }],
+    });
 
-    if (existingUser) {
-      return res
-        .status(400)
-        .json({ error: "User already exists with this phone number" });
+    if (existingContractor) {
+      return res.status(400).json({ error: "Contractor already exists with this phone number" });
     }
 
-    const newUser = new User({
+    const newContractor = new Contractor({
       name,
-      mobileNumber,
-      email,
-      dob: new Date(dob),
-      gender,
+      phoneNumber,
       address,
-      role: "user",
+      category,
+      role: "contractor",
       verified: true,
-      profileImage: {
-        url: profileImage.url,
-        publicId: profileImage.public_id,
-      },
     });
-    await newUser.save();
+    await newContractor.save();
 
-    const { accessToken, refreshToken } = await generateAccessAndRefreshToken(
-      newUser
-    );
+    const accessToken = generateAccessToken(newContractor);
+
+    res.cookie('accessToken', accessToken, { httpOnly: true, secure: true });
 
     return res.status(201).json({
       message: "Signup successful",
-      accessToken,
-      refreshToken,
-      user: { id: newUser._id, name: newUser.name, role: newUser.role },
+      contractor: { id: newContractor._id, name: newContractor.name, address: newContractor.address, category: newContractor.category },
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Failed to create user" });
+    res.status(500).json({ error: "Failed to create contractor" });
   }
 }
-
-
-const logoutUser = async function (req, res) {
-
-  try {
-    await User.findByIdAndUpdate(
-      req.currentUser._id,
-      {
-        $set: {
-          refreshToken: undefined,
-        },
-      },
-      { new: true }
-    );
-    req.currentUser=null
-    return res.status(200).json({ message: "User Logged Out successfully" });
-  } catch (error) {
-
-    console.log("error while loggingout",error);
-   
-  }
-};
-
-
-module.exports = {
-  sendOTPverification,
-  OTPValidation,
-  signup,
-  logoutUser,
-};
