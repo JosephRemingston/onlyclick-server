@@ -1,26 +1,49 @@
-import twilio from 'twilio';
 import dotenv from 'dotenv';
-
 dotenv.config();
+const accountSid = process.env.TWILIO_ACCOUNT_SIDV;
+const authToken = process.env.TWILIO_AUTH_TOKENV;
+const serviceID=process.env.TWILIO_SERVICE_IDV;
+const client = require('twilio')(accountSid, authToken);
 
-const client = twilio(
-  process.env.TWILIO_ACCOUNT_SID,
-  process.env.TWILIO_AUTH_TOKEN
-);
+async function createVerification(phoneNumber) {
+  const formattedPhoneNumber = '+91'+phoneNumber;
 
-export const sendOTP = async (phoneNumber) => {
-  const otp = Math.floor(100000 + Math.random() * 900000).toString();
-  
+  const messageBody = `Femtro: Your verification code is {OTP}. It will expire in 10 minutes.`;
+
   try {
-    await client.messages.create({
-      body: `Your verification code is: ${otp}`,
-      to: phoneNumber,
-      from: process.env.TWILIO_PHONE_NUMBER,
-    });
-    
-    return otp;
+    const verification = await client.verify.v2
+      .services(serviceID)
+      .verifications.create({
+        channel: "sms",
+        to: formattedPhoneNumber,
+        // customMessage: messageBody, // Set custom message body
+      });
+
+    console.log(`Verification status for ${formattedPhoneNumber}: ${verification.status}`);
+    return verification.status;
   } catch (error) {
-    console.error('Twilio error:', error);
-    throw new Error('Failed to send OTP');
+    console.error("Error creating verification:", error.message);
+    throw error;
   }
-};
+}
+
+
+
+async function createVerificationCheck(verificationCode, phoneNumber) {
+    try {
+      const verificationCheck = await client.verify.v2
+        .services(serviceID)
+        .verificationChecks.create({
+          code: verificationCode,
+          to: "+91" + phoneNumber,
+        });
+  
+      console.log(verificationCheck.status);
+      return verificationCheck.status; // "approved" if successful
+    } catch (error) {
+      console.error("Error during OTP verification");
+      throw new Error("Failed to verify OTP. Please try again.");
+    }
+  }
+  
+module.exports = { createVerification,createVerificationCheck };

@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+const jwt = require("jsonwebtoken");
 
 const contractorSchema = new mongoose.Schema({
   name: {
@@ -33,5 +34,29 @@ const contractorSchema = new mongoose.Schema({
 }, {
   timestamps: true
 });
+contractorSchema.methods.generateAccessToken = function () {
+  return jwt.sign(
+    {
+      _id: this._id,
+      name: this.name,
+      mobileNumber: this.mobileNumber,
+      email: this.email,
+      role: this.role,
+    },
+    process.env.JWT_SECRET,
+    { expiresIn: "1d" }
+  );
+};
+
+// Generate Refresh Token
+contractorSchema.methods.generateRefreshToken = function () {
+  return jwt.sign(
+    {
+      _id: this._id,
+    },
+    process.env.JWT_SECRET,
+    { expiresIn: "10d" }
+  );
+};
 
 export default mongoose.model('Contractor', contractorSchema);
