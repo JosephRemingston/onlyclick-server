@@ -4,6 +4,7 @@ import {
   sendOTPverification,
   OTPValidation,
   signup,
+  addSecondaryPhoneNumber
 } from '../controllers/contractor.controller.js';
 import { authenticateAndVerify } from '../middlewre/auth.middleware.js';
 import {
@@ -18,4 +19,5 @@ contactorRouter.route('/addWorker').post(authenticateAndVerify, addWorker);
 contactorRouter
   .route('/removeWorker')
   .post(authenticateAndVerify, removeWorker);
+  contactorRouter.route('/addSecondaryPhoneNumber').post(authenticateAndVerify, addSecondaryPhoneNumber);
 export default contactorRouter;

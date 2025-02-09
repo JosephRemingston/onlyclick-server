@@ -27,8 +27,8 @@ app.get('/',(req,res)=>{
 })
 
 // MongoDB Connection
-mongoose
-  .connect(process.env.MONGODB_URI)
+import { connectDB } from './src/db/configdb.js';
+  connectDB()
   .then(() => console.log('Connected to MongoDB'))
   .catch((err) => console.error('MongoDB connection error:', err));
 

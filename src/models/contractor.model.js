@@ -46,8 +46,8 @@ contractorSchema.methods.generateAccessToken = function () {
       _id: this._id,
       name: this.name,
       phoneNumber: this.phoneNumber,
-      email: this.email,
-      role: this.role,
+      address: this.address,
+      category:this.category  
     },
     process.env.JWT_SECRET,
     { expiresIn: '1d' }

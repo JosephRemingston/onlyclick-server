@@ -54,6 +54,7 @@ const OTPValidation = async (req, res) => {
             name: contractor.name,
             address: contractor.address,
             category: contractor.category,
+            workers: contractor.workers,
           },
         });
       } else {
@@ -103,6 +104,7 @@ const signup = async (req, res) => {
         name: newContractor.name,
         address: newContractor.address,
         category: newContractor.category,
+        workers: newContractor.workers,
       },
     });
   } catch (error) {
@@ -198,11 +200,23 @@ const addSecondaryPhoneNumber = async (req, res) => {
       return res.status(404).json({ error: 'Contractor not found' });
     }
 
-    await createVerification(secondaryPhoneNumber);
-    res.status(200).json({ message: 'OTP sent successfully' });
+    contractor.secondaryPhoneNumber = secondaryPhoneNumber;
+    await contractor.save();
+
+    return res.status(200).json({
+      message: 'Secondary phone number added successfully',
+      contractor: {
+        id: contractor._id,
+        name: contractor.name,
+        address: contractor.address,
+        category: contractor.category,
+        secondaryPhoneNumber: contractor.secondaryPhoneNumber,
+        workers: contractor.workers,
+      },
+    });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Failed to send OTP' });
+    res.status(500).json({ error: 'Failed to add secondary phone number' });
   }
 };
 
@@ -239,6 +253,7 @@ const validateSecondaryPhoneNumber = async (req, res) => {
           address: contractor.address,
           category: contractor.category,
           secondaryPhoneNumber: contractor.secondaryPhoneNumber,
+          workers: contractor.workers,
         },
       });
     } else {
